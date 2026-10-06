@@ -3,8 +3,9 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="../Tests/Tests.vcxproj" />
-  <Project Path="../TMemData/TMemData.vcxproj" />
-  <Project Path="../TVector/TVector.vcxproj" />
-  <Project Path="LabMatrix.vcxproj" />
+  <Project Path="F:/C unn/LabMatrix/LabMatrix/LabMatrix.vcxproj" Id="7f8cd05a-dff6-46ac-9855-90d1c5920b59" />
+  <Project Path="F:/C unn/LabMatrix/Tests/Tests.vcxproj" Id="42b0a4a9-4ff6-47f4-b570-da0806f4a3b0" />
+  <Project Path="F:/C unn/LabMatrix/TMathVector/TMathVector.vcxproj" Id="0f40e9e8-76e3-48f4-baf1-657f38960c13" />
+  <Project Path="F:/C unn/LabMatrix/TMemData/TMemData.vcxproj" Id="08400d0f-dfdb-427d-b95c-d77f4cc5da2c" />
+  <Project Path="F:/C unn/LabMatrix/TVector/TVector.vcxproj" Id="663e65f1-750c-43e0-ac91-1ef85fd4ee74" />
 </Solution>

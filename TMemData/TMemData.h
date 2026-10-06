@@ -144,7 +144,7 @@ void TMemData<T>::set_memory(size_t size) noexcept
 	_data = new T[_capacity];
 }
 template <typename T>
-void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset, bool cap_calculation = true) noexcept //start index - индекс начала элементов в старом массиве
+void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset, bool cap_calculation) noexcept //start index - индекс начала элементов в старом массиве
 {
 	T* old_data = _data;
 	_capacity = (cap_calculation) ? calculate_capacity(size) : size;
