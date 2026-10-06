@@ -28,7 +28,7 @@ public:
     inline const T* const data() const noexcept;        // геттер хранилища
 
     void set_memory(size_t size) noexcept;                                    // установка памяти без сохранения данных
-    void reset_memory(size_t size, size_t start_index = 0, size_t placement_offset = 0) noexcept;          // перевыделение памяти с сохранением данных
+    void reset_memory(size_t size, size_t start_index = 0, size_t placement_offset = 0, bool cap_calculation = true) noexcept;          // перевыделение памяти с сохранением данных
     inline void clear_memory() noexcept;                                             // очистка памяти
 
     TMemData& operator=(const TMemData& other);         // оператор присваивания
@@ -144,10 +144,10 @@ void TMemData<T>::set_memory(size_t size) noexcept
 	_data = new T[_capacity];
 }
 template <typename T>
-void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset) noexcept //start index - индекс начала элементов в старом массиве
+void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset, bool cap_calculation = true) noexcept //start index - индекс начала элементов в старом массиве
 {
 	T* old_data = _data;
-	_capacity = calculate_capacity(size);
+	_capacity = (cap_calculation) ? calculate_capacity(size) : size;
 	_data = new T[_capacity];
 	if (size > _size) {
 		for (size_t i = 0; i < _size; i++) {

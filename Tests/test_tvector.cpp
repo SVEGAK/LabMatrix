@@ -169,6 +169,45 @@ TEST(ClassMemData, can_reset_memory_without_reallocation) {
     EXPECT_DOUBLE_EQ(md.data()[2], 3.0);
 }
 
+TEST(ClassMemData, reset_memory_with_cap_calculation_false) {
+    TMemData<double> md = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+
+    size_t new_size = 3;
+    md.reset_memory(new_size, 0, 0, false);
+
+    EXPECT_EQ(md.size(), new_size);
+    EXPECT_EQ(md.capacity(), new_size);
+    EXPECT_DOUBLE_EQ(md.data()[0], 1.0);
+    EXPECT_DOUBLE_EQ(md.data()[1], 2.0);
+    EXPECT_DOUBLE_EQ(md.data()[2], 3.0);
+}
+
+TEST(ClassMemData, reset_memory_with_cap_calculation_true) {
+    TMemData<double> md = { 1.0, 2.0, 3.0 };
+
+    size_t new_size = 5;
+    md.reset_memory(new_size, 0, 0, true);
+
+    EXPECT_EQ(md.size(), new_size);
+    EXPECT_GT(md.capacity(), new_size);
+    EXPECT_DOUBLE_EQ(md.data()[0], 1.0);
+    EXPECT_DOUBLE_EQ(md.data()[1], 2.0);
+    EXPECT_DOUBLE_EQ(md.data()[2], 3.0);
+}
+
+TEST(ClassMemData, reset_memory_with_start_index_and_cap_false) {
+    TMemData<double> md = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+
+    size_t new_size = 3;
+    md.reset_memory(new_size, 2, 0, false);
+
+    EXPECT_EQ(md.size(), new_size);
+    EXPECT_EQ(md.capacity(), new_size);
+    EXPECT_DOUBLE_EQ(md.data()[0], 3.0);
+    EXPECT_DOUBLE_EQ(md.data()[1], 4.0);
+    EXPECT_DOUBLE_EQ(md.data()[2], 5.0);
+}
+
 TEST(ClassMemData, can_reset_memory_with_shift) {
     TMemData<double> md = { 1.0, 2.0, 3.0, 4.0, 5.0 };
     const double* old_data = md.data();
@@ -1084,6 +1123,7 @@ TEST(VectorTest, ShuffleChangesOrder) {
     std::cout << std::endl;
     EXPECT_EQ(v.size(), original.size());
 }
+
 TEST(VectorTest, QuickSort) {
     TVector<double> v1 = { 1, 2, 3, 4, 5 };
     TVector<double> v2 = { 2, 3, 1 , 5, 4 };
@@ -1093,5 +1133,74 @@ TEST(VectorTest, QuickSort) {
     for (size_t i = 0; i < 5; i++) {
         EXPECT_EQ(v1[i], v2[i]);
     }
+}
+
+TEST(ClassVector, shrink_to_fit_reduces_capacity_to_size) {
+    TVector<double> v;
+    for (int i = 0; i < 5; i++) {
+        v.push_back(i * 10.0);
+    }
+
+    size_t old_capacity = v.capacity();
+    EXPECT_GT(old_capacity, v.size());
+
+    v.shrink_to_fit();
+
+    EXPECT_EQ(v.capacity(), v.size());
+    EXPECT_EQ(v.size(), 5);
+
+    for (int i = 0; i < 5; i++) {
+        EXPECT_DOUBLE_EQ(v[i], i * 10.0);
+    }
+}
+
+TEST(ClassVector, shrink_to_fit_on_empty_vector) {
+    TVector<double> v;
+    v.push_back(1.0);
+    v.push_back(2.0);
+    v.pop_back();
+    v.pop_back();
+
+    EXPECT_TRUE(v.is_empty());
+    EXPECT_EQ(v.size(), 0);
+
+    EXPECT_NO_THROW(v.shrink_to_fit());
+
+    EXPECT_EQ(v.size(), 0);
+    EXPECT_EQ(v.capacity(), 0);
+}
+
+TEST(ClassVector, shrink_to_fit_idempotent_when_already_fitted) {
+    TVector<double> v;
+    v.push_back(42.0);
+
+    v.shrink_to_fit();
+    EXPECT_EQ(v.capacity(), v.size());
+
+    size_t current_cap = v.capacity();
+
+    v.shrink_to_fit();
+
+    EXPECT_EQ(v.capacity(), current_cap);
+    EXPECT_EQ(v.size(), 1);
+    EXPECT_DOUBLE_EQ(v[0], 42.0);
+}
+
+TEST(ClassVector, shrink_to_fit_single_element) {
+    TVector<double> v;
+    v.push_back(99.0);
+    v.push_back(100.0);
+    v.pop_back();
+
+    EXPECT_EQ(v.size(), 1);
+    EXPECT_EQ(v.capacity(), 1);
+
+    v.shrink_to_fit();
+
+    EXPECT_EQ(v.capacity(), 1);
+    EXPECT_EQ(v.size(), 1);
+    EXPECT_DOUBLE_EQ(v[0], 99.0);
+    EXPECT_EQ(v.front_pos(), 0);
+    EXPECT_EQ(v.back_pos(), 0);
 }
 #endif

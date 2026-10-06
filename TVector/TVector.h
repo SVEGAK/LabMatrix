@@ -23,6 +23,7 @@ public:
     inline bool is_full() const noexcept;     // проверка на переполнение
 
     inline void compress() noexcept;          //сжатие буфера
+	inline void shrink_to_fit() noexcept;	  //освобожение лишней памяти capacity=size
     inline size_t size() const noexcept;      // геттер размера
     inline size_t capacity() const noexcept;  // геттер вместимости
     inline T front() const;                   // геттер первого элемента
@@ -98,6 +99,13 @@ inline void TVector<T>::compress() noexcept
         _mem.reset_memory(size(), _front, 0);
         _front = 0; _back = size() - 1;
     }
+}
+template <typename T>
+inline void TVector<T>::shrink_to_fit() noexcept {
+	if (size() != capacity()) {
+		_mem.reset_memory(size(), _front, 0,false);
+		_front = 0; _back = size() - 1;
+	}
 }
 
 template <typename T>
