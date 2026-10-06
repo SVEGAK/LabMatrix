@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="../Tests/Tests.vcxproj" />
+  <Project Path="../TMemData/TMemData.vcxproj" />
+  <Project Path="../TVector/TVector.vcxproj" />
+  <Project Path="LabMatrix.vcxproj" />
+</Solution>
