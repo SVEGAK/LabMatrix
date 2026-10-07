@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
-//#define MEMDATA_TESTS
-//#define VECTOR_TESTS
+#define MEMDATA_TESTS
+#define VECTOR_TESTS
 #define TMATHVECTOR_TESTS
 
 #ifdef MEMDATA_TESTS

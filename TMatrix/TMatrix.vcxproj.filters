@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h">
+    <ClInclude Include="TMatrix.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="TMathVector.h">
+    <ClInclude Include="pch.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

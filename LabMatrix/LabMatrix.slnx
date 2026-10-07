@@ -3,6 +3,7 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Project Path="../TMatrix/TMatrix.vcxproj" Id="2aa62f12-211c-4235-94a9-c2c1c75567d2" />
   <Project Path="F:/C unn/LabMatrix/LabMatrix/LabMatrix.vcxproj" Id="7f8cd05a-dff6-46ac-9855-90d1c5920b59" />
   <Project Path="F:/C unn/LabMatrix/Tests/Tests.vcxproj" Id="42b0a4a9-4ff6-47f4-b570-da0806f4a3b0" />
   <Project Path="F:/C unn/LabMatrix/TMathVector/TMathVector.vcxproj" Id="0f40e9e8-76e3-48f4-baf1-657f38960c13" />

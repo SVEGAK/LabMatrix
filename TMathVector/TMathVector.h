@@ -7,23 +7,23 @@ template <typename T>
 class TMathVector: public TVector<T>{
     size_t _start_index;
 public:
-    TMathVector(size_t size = 0);// конструктор по размеру + по умолчанию
-    TMathVector(size_t size, T* data);// конструктор по размеру + по умолчанию 
-    TMathVector(std::initializer_list<T>);                // конструктор по списку инициализации
-    TMathVector(const TMathVector<T>& other) = default;   // конструктор копирования
+    TMathVector(size_t size = 0);                                 // конструктор по размеру + по умолчанию
+    TMathVector(size_t size, T* data);                           // конструктор по размеру + по умолчанию 
+    TMathVector(std::initializer_list<T>);                      // конструктор по списку инициализации
+    TMathVector(const TMathVector<T>& other) = default;        // конструктор копирования
     TMathVector(TMathVector<T>&& other) noexcept = default;   // конструктор с move-семантикой
     ~TMathVector() = default;
 
     TMathVector<T> operator*(double val) const;                  //Умножение на скаляр
-    TMathVector<T>& operator*=(double val);                //Умножение на скаляр
+    TMathVector<T>& operator*=(double val);                      //Умножение на скаляр
 
     T operator*(const TMathVector<T>& other) const;              //Скалярное умножение на вектор
 
     TMathVector<T> operator+(const TMathVector<T> &other) const; //Сложение векторов
-    TMathVector<T>& operator+=(const TMathVector<T>& other);      //Сложение векторов
+    TMathVector<T>& operator+=(const TMathVector<T>& other);     //Сложение векторов
 
     TMathVector<T> operator-(const TMathVector<T>& other) const; //Вычитание векторов
-    TMathVector<T>& operator-=(const TMathVector<T>& other);      //Вычитание векторов
+    TMathVector<T>& operator-=(const TMathVector<T>& other);     //Вычитание векторов
 
     TMathVector<T>& operator=(const TMathVector<T>& other) noexcept;           // оператор присваивания
     TMathVector<T>& operator=(TMathVector<T>&& other) noexcept;                // оператор присваивания с move-семантикой
