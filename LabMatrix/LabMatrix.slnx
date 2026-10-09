@@ -4,9 +4,9 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="../TMatrix/TMatrix.vcxproj" Id="2aa62f12-211c-4235-94a9-c2c1c75567d2" />
-  <Project Path="../LabMatrix/LabMatrix/LabMatrix.vcxproj" Id="7f8cd05a-dff6-46ac-9855-90d1c5920b59" />
-  <Project Path="../LabMatrix/Tests/Tests.vcxproj" Id="42b0a4a9-4ff6-47f4-b570-da0806f4a3b0" />
-  <Project Path="../LabMatrix/TMathVector/TMathVector.vcxproj" Id="0f40e9e8-76e3-48f4-baf1-657f38960c13" />
-  <Project Path="../LabMatrix/TMemData/TMemData.vcxproj" Id="08400d0f-dfdb-427d-b95c-d77f4cc5da2c" />
-  <Project Path="../LabMatrix/TVector/TVector.vcxproj" Id="663e65f1-750c-43e0-ac91-1ef85fd4ee74" />
+  <Project Path="../LabMatrix/LabMatrix.vcxproj" Id="7f8cd05a-dff6-46ac-9855-90d1c5920b59" />
+  <Project Path="../Tests/Tests.vcxproj" Id="42b0a4a9-4ff6-47f4-b570-da0806f4a3b0" />
+  <Project Path="../TMathVector/TMathVector.vcxproj" Id="0f40e9e8-76e3-48f4-baf1-657f38960c13" />
+  <Project Path="../TMemData/TMemData.vcxproj" Id="08400d0f-dfdb-427d-b95c-d77f4cc5da2c" />
+  <Project Path="../TVector/TVector.vcxproj" Id="663e65f1-750c-43e0-ac91-1ef85fd4ee74" />
 </Solution>
