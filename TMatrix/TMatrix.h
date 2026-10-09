@@ -1,14 +1,26 @@
 ﻿#pragma once
 #include "TMathVector.h"
 #include <exception>
+#include <iostream>
 
 template <typename T>
 class TMatrix: public TMathVector<TMathVector<T>> {//Прямоугольная матрица
 public:
-    TMatrix(size_t rows = 0,size_t columns = 0) : TMathVector<TMathVector<T>>(rows,columns) {};// конструктор по размеру + по умолчанию
-    TMatrix(size_t size, T* data) : TMathVector<TMathVector<T>>(size, data) {};                        // конструктор по размеру + по умолчанию 
-    TMatrix(std::initializer_list<std::initializer_list<T>> list)
-        : TMathVector<TMathVector<T>>(list) {};// конструктор по списку инициализации
+    TMatrix(size_t rows = 0, size_t columns = 0) {// конструктор по размеру + по умолчанию 
+        for (size_t i = 0; i < rows; ++i) {
+            this->push_back(TMathVector<T>(columns));
+        }
+    }  
+    TMatrix(std::initializer_list<std::initializer_list<T>> list) {
+        if (list.size() == 0) { return; }
+        size_t expected_cols = list.begin()->size();
+        for (const auto& row_data : list) {
+            if (row_data.size() != expected_cols) {
+                throw std::invalid_argument("Все строки матрицы должны иметь одинаковую длину.");
+            }
+            this->push_back(TMathVector<T>(row_data));
+        }
+    }
     TMatrix(const TMatrix<T>& other) = default;         // конструктор копирования
     TMatrix(TMatrix<T>&& other) noexcept = default;     // конструктор с move-семантикой
     ~TMatrix() = default;
@@ -21,20 +33,12 @@ public:
     TMatrix<T> operator*(const TMatrix<T>& other) const;
 
     // сложение
-    TMatrix<T> operator+(const TMatrix<T>& other) const;
     TMatrix<T>& operator+=(const TMatrix<T>& other);
+    TMatrix<T> operator+(const TMatrix<T>& other) const;
 
     // вычитание
-    TMatrix<T> operator-(const TMatrix<T>& other) const;
     TMatrix<T>& operator-=(const TMatrix<T>& other);
-
-    // операторы присваивания
-    TMatrix<T>& operator=(const TMatrix<T>& other);
-    TMatrix<T>& operator=(TMatrix<T>&& other) noexcept;
-
-    // операторы сравнения
-    bool operator==(const TMatrix<T>& other) const noexcept;
-    bool operator!=(const TMatrix<T>& other) const noexcept;
+    TMatrix<T> operator-(const TMatrix<T>& other) const;
 
     // оператор доступа к элементу
     T& operator()(size_t row, size_t col) {
@@ -48,9 +52,8 @@ public:
     // геттеры размеров
     size_t getRows() const { return this->size(); }
     size_t getCols() const { return this->size() > 0 ? (*this)[0].size() : 0; }
-
-    friend std::ostream& operator<<(std::ostream& os, const TMatrix<T>& m);
-    friend std::istream& operator>>(std::istream& is, TMatrix<T>& m);
 };
+
+
 
 

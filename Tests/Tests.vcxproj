@@ -106,7 +106,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="test_tvector.cpp" />
+    <ClCompile Include="Test_TMathVector.cpp" />
+    <ClCompile Include="Test_TMatrix.cpp" />
+    <ClCompile Include="Test_TMemData.cpp" />
+    <ClCompile Include="Test_TVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

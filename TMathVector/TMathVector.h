@@ -1,7 +1,9 @@
 ﻿#pragma once
+
 #include "TVector.h"
 #include "TMemData.h"
 #include <exception>
+#include <initializer_list>
 
 template <typename T>
 class TMathVector: public TVector<T>{
@@ -9,7 +11,7 @@ class TMathVector: public TVector<T>{
 public:
     TMathVector(size_t size = 0);                                 // конструктор по размеру + по умолчанию
     TMathVector(size_t size, T* data);                           // конструктор по размеру + по умолчанию 
-    TMathVector(std::initializer_list<T>);                      // конструктор по списку инициализации
+    TMathVector(std::initializer_list<T> list);                      // конструктор по списку инициализации
     TMathVector(const TMathVector<T>& other) = default;        // конструктор копирования
     TMathVector(TMathVector<T>&& other) noexcept = default;   // конструктор с move-семантикой
     ~TMathVector() = default;
@@ -33,8 +35,6 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const TMathVector<T>& v) {
         os << static_cast<const TVector<T>&>(v);
-        os << " (start_index: " << v._start_index << ")";
-
         return os;
     }
     friend std::istream& operator>>(std::istream& is, TMathVector<T>& v) {
@@ -60,7 +60,7 @@ TMathVector<T>::TMathVector(size_t size, T* data): TVector<T>(data,size)
 }
 
 template<typename T>
-TMathVector<T>::TMathVector(std::initializer_list<T> list) : TVector<T>(list)
+TMathVector<T>::TMathVector(std::initializer_list<T> list): TVector<T>(list)
 {
     _start_index = 0;
     (*this).shrink_to_fit();
