@@ -28,7 +28,7 @@ public:
     inline const T* const data() const noexcept;        // геттер хранилища
 
     void set_memory(size_t size) noexcept;                                    // установка памяти без сохранения данных
-    void reset_memory(size_t size, size_t start_index = 0, size_t placement_offset = 0, bool cap_calculation = true) noexcept;          // перевыделение памяти с сохранением данных
+    void reset_memory(size_t size, size_t start_index = 0, size_t placement_offset = 0, bool cap_calculation = true);          // перевыделение памяти с сохранением данных
     inline void clear_memory() noexcept;                                             // очистка памяти
 
     TMemData& operator=(const TMemData& other);         // оператор присваивания
@@ -144,7 +144,7 @@ void TMemData<T>::set_memory(size_t size) noexcept
 	_data = new T[_capacity];
 }
 template <typename T>
-void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset, bool cap_calculation) noexcept //start index - индекс начала элементов в старом массиве
+void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset, bool cap_calculation)//start index - индекс начала элементов в старом массиве
 {
 	T* old_data = _data;
 	_capacity = (cap_calculation) ? calculate_capacity(size) : size;
@@ -169,11 +169,12 @@ template <typename T>
 TMemData<T>& TMemData<T>::operator=(const TMemData& other)
 {
 	if (this != &other) {
-		(*this)._size = other._size;
-		(*this)._capacity = other._capacity;
-		(*this)._data = new T[(*this)._capacity];
-		for (size_t i = 0; i < _capacity; i++) {
-			(*this)._data[i] = other._data[i];
+		delete[] _data;
+		_size = other._size;
+		_capacity = other._capacity;
+		_data = new T[_capacity];
+		for (size_t i = 0; i < _size; i++) {
+			_data[i] = other._data[i];
 		}
 	}
 	return (*this);
@@ -182,9 +183,9 @@ template <typename T>
 TMemData<T>& TMemData<T>::operator=(TMemData&& other) noexcept
 {
 	if (this != &other) {
-		(*this)._size = other._size;
-		(*this)._capacity = other._capacity;
-		(*this)._data = other._data;
+		_size = other._size;
+		_capacity = other._capacity;
+		_data = other._data;
 		other._size = 0;
 		other._capacity = 0;
 		other._data = nullptr;

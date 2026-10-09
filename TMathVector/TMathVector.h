@@ -91,7 +91,7 @@ T TMathVector<T>::operator*(const TMathVector<T>& other) const
     if ((*this).size() == other.size()) {
         T result = 0;
         for (size_t i = 0; i < (*this).size(); i++) {
-            result += (*this)[i]* other[i];
+            result += (*this)[i] * other[i];
         }
         return result;
     }

@@ -23,7 +23,7 @@ public:
     inline bool is_full() const noexcept;     // проверка на переполнение
 
     inline void compress() noexcept;          //сжатие буфера
-	inline void shrink_to_fit() noexcept;	  //освобожение лишней памяти capacity=size
+	inline void shrink_to_fit();	  //освобожение лишней памяти capacity=size
     inline size_t size() const noexcept;      // геттер размера
     inline size_t capacity() const noexcept;  // геттер вместимости
     inline T front() const;                   // геттер первого элемента
@@ -34,10 +34,10 @@ public:
     inline T& set_front();                    // сеттер первого элемента
     inline T& set_back();                     // сеттер последнего элемента
 
-    void push_front(T elem) noexcept;         // вставка элемента в начало
-    void push_back(T elem) noexcept;          // вставка элемента в конец
+    void push_front(T elem);         // вставка элемента в начало
+    void push_back(T elem);					  // вставка элемента в конец
     void insert(T elem, size_t pos);          // вставка элемента по позиции
-    void push_when_empty(T elem) noexcept;    //вспомогательная функция для вставки
+    void push_when_empty(T elem);    //вспомогательная функция для вставки
     inline void size_decrease() noexcept;     //вспомогательная функция уменьшения size
     inline void size_increase() noexcept;     //вспомогательная функция увеличения size
     void pop_front();                         // удаление элемента из начала
@@ -50,8 +50,8 @@ public:
     TVector& operator=(const TVector& other) noexcept;            // оператор присваивания
     TVector& operator=(TVector&& other) noexcept;                 // оператор присваивания с move-семантикой
 
-    T operator[](size_t pos) const noexcept;                      // оператор обращения по индексу константный
-    T& operator[](size_t pos) noexcept;                           // оператор обращения по индексу
+    T operator[](size_t pos) const;                      // оператор обращения по индексу константный
+    T& operator[](size_t pos);                           // оператор обращения по индексу
 
 	friend std::ostream& operator<<(std::ostream& os, const TVector<T>& v) {// вывод
 		os << "{ ";
@@ -101,7 +101,7 @@ inline void TVector<T>::compress() noexcept
     }
 }
 template <typename T>
-inline void TVector<T>::shrink_to_fit() noexcept {
+inline void TVector<T>::shrink_to_fit(){
 	if (size() != capacity()) {
 		_mem.reset_memory(size(), _front, 0,false);
 		_front = 0; _back = size() - 1;
@@ -242,22 +242,23 @@ TVector<T>& TVector<T>::operator=(TVector&& other) noexcept
 	other._back = 0;
 	return (*this);
 }
-
 template <typename T>
-T TVector<T>::operator[](size_t pos) const noexcept {
+T TVector<T>::operator[](size_t pos) const {
+	if (_mem._size <= 0) { throw std::logic_error("Can't apply [] operator to empty vector(size<=0)."); }
 	pos = (pos + _front) % capacity();
 	return _mem._data[pos];
 }
 
 template <typename T>
-T& TVector<T>::operator[](size_t pos) noexcept
+T& TVector<T>::operator[](size_t pos)
 {
+	if (_mem._size <= 0) { throw std::logic_error("Can't apply [] operator to empty vector(size<=0)."); }
 	pos = (pos + _front) % capacity();
 	return (_mem._data[pos]);
 }
 
 template <typename T>
-void TVector<T>::push_back(T elem) noexcept {
+void TVector<T>::push_back(T elem) {
 	if ((size() == 0) || is_empty()) {//если объект пуст или даже nullptr
 		push_when_empty(elem);
 		return;
@@ -265,7 +266,7 @@ void TVector<T>::push_back(T elem) noexcept {
 	if ((_back == (capacity() - 1)) && !(_mem.is_full())) {
 		_mem.reset_memory(size() + 1, _front, 0);//просто сдвигаем массив влево если есть свободное место
 		_front = 0;
-		_back = _front + size() - 1;
+		_back = (_mem._size > 0) ? _front + size() - 1 : 0;//пересчитываю back c защитой от вылета из size_t
 		_mem._data[_back] = elem;
 		return;
 
@@ -273,7 +274,7 @@ void TVector<T>::push_back(T elem) noexcept {
 	else if (is_full()) {
 		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER); // выделяем буфер
 		_front = FRONT_BUFFER;
-		_back = _front + size() - 1; //пересчитываю back
+		_back = (_mem._size > 0) ? _front + size() - 1 : 0;//пересчитываю back c защитой от вылета из size_t
 		_mem._data[_back] = elem;// ставлю элемент в нововыделенную ячейку
 		return;
 	}
@@ -314,7 +315,7 @@ void TVector<T>::insert(T elem, size_t pos)
 }
 
 template <typename T>
-void TVector<T>::push_front(T elem) noexcept
+void TVector<T>::push_front(T elem)
 {
 	if ((size() == 0) || (is_empty())) {//если объект пуст
 		push_when_empty(elem);
@@ -324,22 +325,21 @@ void TVector<T>::push_front(T elem) noexcept
 		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER); //увеличиваем на 1 ячейку size + выделяем буфер
 		_front = FRONT_BUFFER - 1;//берем элемент перед тем который уже стоит первым
 		_back = _front + size() - 1;
-		(*this)[0] = elem;
+		_mem._data[0] = std::move(elem);
 		return;
 	}
 	_front--;
-	(*this)[0] = elem;
+	_mem._data[0] = std::move(elem);
 	size_increase();
 	return;
 }
 
 template <typename T>
-void TVector<T>::push_when_empty(T elem) noexcept
+void TVector<T>::push_when_empty(T elem)
 {
-	_front = 0;
-	_mem.set_memory(_front);
-	_back = _front;
-	(*this)[0] = elem;
+	_front = 0; _back = 0;
+	_mem.set_memory(1);
+	_mem._data[0] = std::move(elem);
 	size_increase();
 	return;
 }
