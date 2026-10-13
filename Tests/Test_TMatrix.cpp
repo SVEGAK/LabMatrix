@@ -2,7 +2,6 @@
 
 #ifdef TMATRIX_TESTS
 #include "TMatrix.h"
-
 //Унаследованные от TMathVector методы
 
 TEST(TMatrixInherited, SizeAndCapacityReflectRows) {

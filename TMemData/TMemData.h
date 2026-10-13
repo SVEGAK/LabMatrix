@@ -12,7 +12,7 @@ class TMemData {
     size_t _capacity;         // вместимость хранилища
 
 public:
-    TMemData(size_t size = 0);                            // конструктор по размеру + по умолчанию
+    TMemData(size_t size = 0);						  // конструктор по размеру + по умолчанию
     TMemData(std::initializer_list<T> list);             // конструктор по списку инициализации
     TMemData(T* data, size_t size);                     // конструктор инициализации
     TMemData(const TMemData& other);                   // конструктор копирования
@@ -39,7 +39,7 @@ public:
 template <typename T>
 inline bool TMemData<T>::is_empty() const noexcept
 {
-    return _size == 0 || _data == nullptr;
+	return _size == 0;
 }
 template <typename T>
 inline bool TMemData<T>::is_full() const noexcept
@@ -64,8 +64,10 @@ inline const T* const TMemData<T>::data() const noexcept
 template <typename T>
 inline void TMemData<T>::clear_memory() noexcept // решил сделать inline, тк функция достаточно маленькая
 {
-    delete[] _data;
-    _data = nullptr;
+	delete[] _data;
+	_data = nullptr;
+	_size = 0;
+	_capacity = 0;
 }
 template <typename T>
 inline size_t TMemData<T>::calculate_capacity(size_t size)
@@ -80,11 +82,14 @@ inline size_t TMemData<T>::calculate_capacity(size_t size)
 }
 
 template <typename T>
-TMemData<T>::TMemData(size_t size) {
+TMemData<T>::TMemData(size_t size)
+{
+	_size = size;
 	_capacity = calculate_capacity(size);
-	_size = 0;
 	_data = new T[_capacity];
-
+	for (size_t i = 0; i < _capacity; ++i) {
+		_data[i] = T();          // значение по умолчанию
+	}
 }
 template <typename T>
 TMemData<T>::TMemData(std::initializer_list<T> list)
@@ -92,10 +97,10 @@ TMemData<T>::TMemData(std::initializer_list<T> list)
 {
 	_size = list.size();
 	_capacity = _size;
-	_data = new T[_capacity];
+	_data = new T[_size];
 	const T* list_begin_p = list.begin();
 	for (size_t i = 0; i < _size; i++) {
-		_data[i] = *(list_begin_p + i);
+		_data[i] = list_begin_p[i];
 	}
 }
 template <typename T>
@@ -142,28 +147,35 @@ void TMemData<T>::set_memory(size_t size) noexcept
 	_capacity = calculate_capacity(size);
 	delete[] _data;
 	_data = new T[_capacity];
+	for (size_t i = 0; i < _capacity; i++) {
+		_data[i] = T();
+	}
 }
 template <typename T>
-void TMemData<T>::reset_memory(size_t size, size_t start_index, size_t placement_offset, bool cap_calculation)//start index - индекс начала элементов в старом массиве
+void TMemData<T>::reset_memory(size_t size, size_t start_index,
+	size_t placement_offset, bool cap_calculation)
 {
 	T* old_data = _data;
-	_capacity = (cap_calculation) ? calculate_capacity(size) : size;
+	size_t old_capacity = _capacity;
+	size_t old_size = _size;
+
+	_capacity = cap_calculation ? calculate_capacity(size) : size;
 	_data = new T[_capacity];
-	if (size > _size) {
-		for (size_t i = 0; i < _size; i++) {
-			_data[i + placement_offset] = old_data[i + start_index];
+	for (size_t i = 0; i < _capacity; ++i) {
+		_data[i] = T();
+	}
+
+	size_t count = (size > old_size) ? old_size : size;
+	if (count > 0 && old_capacity > 0) {
+		for (size_t i = 0; i < count; ++i) {
+			size_t src = (start_index + i) % old_capacity;   // ← обход кольца
+			_data[i + placement_offset] = old_data[src];
 		}
 	}
-	else { //size <= _size
-		for (size_t i = 0; i < size; i++) {
-			_data[i + placement_offset] = old_data[i + start_index];
-		}
-	}
+
 	_size = size;
 	delete[] old_data;
-	return;
 }
-
 
 template <typename T>
 TMemData<T>& TMemData<T>::operator=(const TMemData& other)

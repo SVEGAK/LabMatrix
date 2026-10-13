@@ -16,7 +16,7 @@ TEST(ClassVector, can_create_with_constructor_by_size) {
 
     EXPECT_EQ(v1.front_pos(), 0);
     EXPECT_EQ(v1.back_pos(), 4);
-    EXPECT_EQ(v1.is_empty(), true);
+    EXPECT_EQ(v1.is_empty(), false);
 }
 
 TEST(ClassVector, can_create_with_constructor_by_initializer_list) {

@@ -43,7 +43,7 @@ TEST(ClassMemData, can_create_with_default_constructor) {
 
 TEST(ClassMemData, can_create_with_constructor_by_size) {
     TMemData<double> md(5);
-    EXPECT_EQ(md.size(), 0);
+    EXPECT_EQ(md.size(), 5);
     EXPECT_EQ(md.capacity(), 5);
 }
 

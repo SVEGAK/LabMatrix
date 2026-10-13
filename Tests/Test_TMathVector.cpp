@@ -6,8 +6,8 @@
 
 TEST(TMathVector, constructors_maintain_size_equals_capacity) {
     TMathVector<double> v1(5);
-    EXPECT_EQ(v1.size(), 0);
-    EXPECT_EQ(v1.capacity(), 0);
+    EXPECT_EQ(v1.size(), 5);
+    EXPECT_EQ(v1.capacity(), 5);
 
     TMathVector<double> v2 = { 1.0, 2.0, 3.0, 4.0 };
     EXPECT_EQ(v2.size(), 4);

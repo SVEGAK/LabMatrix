@@ -12,7 +12,7 @@ class TVector {
     size_t _front;            // индекс первого элемента
     size_t _back;             // индекс последнего элемента
 public:
-    TVector(size_t size = 0);                 // конструктор по размеру + по умолчанию
+    TVector(size_t size = 0);              // конструктор по размеру + по умолчанию
     TVector(std::initializer_list<T>);        // конструктор по списку инициализации
     TVector(T* list, size_t size);            // конструктор инициализации
     TVector(const TVector& other);            // конструктор копирования
@@ -50,7 +50,7 @@ public:
     TVector& operator=(const TVector& other) noexcept;            // оператор присваивания
     TVector& operator=(TVector&& other) noexcept;                 // оператор присваивания с move-семантикой
 
-    T operator[](size_t pos) const;                      // оператор обращения по индексу константный
+    const T& operator[](size_t pos) const;                      // оператор обращения по индексу константный
     T& operator[](size_t pos);                           // оператор обращения по индексу
 
 	friend std::ostream& operator<<(std::ostream& os, const TVector<T>& v) {// вывод
@@ -175,22 +175,15 @@ inline T& TVector<T>::set_back() {
 }
 
 
-template <typename T>
-TVector<T>::TVector(size_t size) {//конструктор по умолчанию+размеру
-	TMemData<T> object(size);
-	_front = 0;
-	if (size == 0) { _back = size; }
-	else { _back = size - 1; }
-	_mem = object;
-}
+template<typename T>
+TVector<T>::TVector(size_t size) : _mem(size), _front(0), _back((size > 0) ? size - 1 : 0) {}
+
 
 template <typename T>
-TVector<T>::TVector(std::initializer_list<T> list)
+TVector<T>::TVector(std::initializer_list<T> list): _mem(list)
 {
 	_front = 0;
-	TMemData<T> md(list);
-	_mem = md;
-	_back = list.size() - 1;
+	_back = (list.size() > 0) ? size() - 1 : 0;
 }
 
 template <typename T>
@@ -217,8 +210,7 @@ TVector<T>::TVector(TVector&& other) noexcept
 {
 	_front = other._front;
 	_back = other._back;
-	TMemData<T> mem(std::move(other._mem));
-	_mem = mem;
+	_mem = std::move(other._mem);
 	other._front = 0;
 	other._back = 0;
 }
@@ -243,10 +235,10 @@ TVector<T>& TVector<T>::operator=(TVector&& other) noexcept
 	return (*this);
 }
 template <typename T>
-T TVector<T>::operator[](size_t pos) const {
+const T& TVector<T>::operator[](size_t pos) const {
 	if (_mem._size <= 0) { throw std::logic_error("Can't apply [] operator to empty vector(size<=0)."); }
 	pos = (pos + _front) % capacity();
-	return _mem._data[pos];
+	return (_mem._data[pos]);
 }
 
 template <typename T>
@@ -299,7 +291,7 @@ void TVector<T>::insert(T elem, size_t pos)
 	if (is_full()) {
 		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
 		_front = FRONT_BUFFER;
-		_back = _front + size() - 1;
+		_back = (_mem._size > 0) ? _front + size() - 1 : 0;
 	}
 	else {
 		size_increase();
@@ -324,12 +316,12 @@ void TVector<T>::push_front(T elem)
 	if ((is_full()) || (_front == _back) || (_front == 0)) {
 		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER); //увеличиваем на 1 ячейку size + выделяем буфер
 		_front = FRONT_BUFFER - 1;//берем элемент перед тем который уже стоит первым
-		_back = _front + size() - 1;
-		_mem._data[0] = std::move(elem);
+		_back = (_mem._size > 0) ? _front + size() - 1 : 0;
+		_mem._data[_front] = std::move(elem);
 		return;
 	}
 	_front--;
-	_mem._data[0] = std::move(elem);
+	_mem._data[_front] = std::move(elem);
 	size_increase();
 	return;
 }
@@ -339,7 +331,7 @@ void TVector<T>::push_when_empty(T elem)
 {
 	_front = 0; _back = 0;
 	_mem.set_memory(1);
-	_mem._data[0] = std::move(elem);
+	_mem._data[_front] = std::move(elem);
 	size_increase();
 	return;
 }
