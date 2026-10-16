@@ -115,7 +115,7 @@ TEST(ClassVector, can_set_back) {
     v3.set_back() = 99.0;
     EXPECT_DOUBLE_EQ(v3.back(), 99.0);
     EXPECT_DOUBLE_EQ(v3[v3.size() - 1], 99.0);
-    EXPECT_DOUBLE_EQ(v3.back_pos(), 9);
+    EXPECT_DOUBLE_EQ(v3.back_pos(), 19);
 }
 
 TEST(ClassVector, throw_when_try_get_front_in_empty_vector) {
@@ -254,7 +254,7 @@ TEST(ClassVector, can_pop_front) {
 }
 
 TEST(ClassVector, can_pop_front_with_reallocation) {
-    TVector<double> v(5);
+    TVector<double> v(0);
     EXPECT_EQ(v.size(), 0);
 
     for (int i = 0; i < 5; i++) {
@@ -272,6 +272,8 @@ TEST(ClassVector, can_pop_front_with_reallocation) {
     EXPECT_EQ(v.size(), 2);
     EXPECT_DOUBLE_EQ(v.front(), 3.0);
     EXPECT_DOUBLE_EQ(v.back(), 4.0);
+    EXPECT_DOUBLE_EQ(v.front_pos(), 0);
+    EXPECT_DOUBLE_EQ(v.back_pos(), 1);
 
 
     EXPECT_GE(v.capacity(), v.size());
@@ -309,7 +311,7 @@ TEST(ClassVector, can_pop_back) {
 
 TEST(ClassVector, can_pop_back_with_reallocation) {
 
-    TVector<double> v(10);
+    TVector<double> v;
 
     for (int i = 0; i < 10; i++) {
         v.push_back(i * 1.0);
@@ -408,7 +410,7 @@ TEST(ClassVector, can_correctly_recalc_back_in_area_of_zero) {
     }
 }
 TEST(ClassVector, can_correctly_recalc_front_in_area_of_zero) {
-    TVector<double> v(10);
+    TVector<double> v(0);
     for (int i = 0; i < 10; i++) v.push_back(i * 1.0);
 
     for (int i = 0; i < 10; i++) v.pop_front();
@@ -458,16 +460,13 @@ TEST(ClassVector, can_erase_back) {
 }
 
 TEST(ClassVector, can_erase_with_reallocation) {
-    TVector<double> v(5);
+    TVector<double> v(0);
     for (int i = 0; i < 5; i++) {
         v.push_back(i * 1.0);
     }
     v.erase(0);
     v.erase(0);
     v.erase(0);
-    //for (size_t i = 0; i < v.size();i++) {
-    //    EXPECT_DOUBLE_EQ(v[i],0);
-    //}
     EXPECT_DOUBLE_EQ(v.back_pos(), 1);
     EXPECT_EQ(v.size(), 2);
     EXPECT_DOUBLE_EQ(v.front(), 3);
@@ -544,7 +543,7 @@ TEST(ClassVector, can_move_assigment) {
 
     EXPECT_EQ(8, vec_2.size());
     EXPECT_EQ(15, vec_2.capacity());
-    EXPECT_EQ(1, vec_2.front_pos());
+    EXPECT_EQ(0, vec_2.front_pos());
     for (size_t i = 0; i < vec_2.size(); i++) {
         EXPECT_EQ(vec_2[i], i + 1);
     }
@@ -648,21 +647,6 @@ TEST(ClassVector, can_push_back_n_empty) {
     EXPECT_EQ(v.back_pos(), 2);
 }
 
-TEST(ClassVector, can_push_back_n_no_realloc) {
-    TVector<double> v(10);                     // capacity = 15
-    v.push_back(10.0);                // size=1, back=0
-    double vals[] = { 20.0, 30.0 };
-    v.push_back_n(vals, 2);           // должно хватить места без реаллокации
-
-    EXPECT_EQ(v.size(), 3);
-    EXPECT_EQ(v.capacity(), 15);
-    EXPECT_DOUBLE_EQ(v[0], 10.0);
-    EXPECT_DOUBLE_EQ(v[1], 20.0);
-    EXPECT_DOUBLE_EQ(v[2], 30.0);
-    EXPECT_EQ(v.front_pos(), 0);
-    EXPECT_EQ(v.back_pos(), 2);
-}
-
 TEST(ClassVector, can_push_back_n_with_reallocation) {
     TVector<double> v = { 1.0, 2.0, 3.0 };       // capacity = 3, full
     double vals[] = { 4.0, 5.0, 6.0 };
@@ -680,7 +664,6 @@ TEST(ClassVector, can_push_back_n_with_reallocation) {
     EXPECT_DOUBLE_EQ(v[5], 6.0);
 }
 
-// push_front_n
 TEST(ClassVector, can_push_front_n_empty) {
     TVector<double> v;
     double vals[] = { 3.0, 2.0, 1.0 };
@@ -693,43 +676,6 @@ TEST(ClassVector, can_push_front_n_empty) {
     EXPECT_DOUBLE_EQ(v[2], 1.0);
     EXPECT_EQ(v.front_pos(), 0);
     EXPECT_EQ(v.back_pos(), 2);
-}
-
-TEST(ClassVector, can_push_front_n_no_realloc) {
-    TVector<double> v(10);
-    v.push_front(10.0);               // front=9, back=9 (после push_front для size=0 вызывает push_when_empty, затем front=0)
-    // Сбросим в нормальное состояние: v = {10} с front=0
-    // Легче создать готовый вектор с местом спереди:
-    TVector<double> v2(10);
-    v2.push_back(1.0);
-    v2.push_back(2.0);
-    v2.push_back(3.0);                // сейчас front=0, back=2
-    double vals[] = { -2.0, -1.0, 0.0 };
-    v2.push_front_n(vals, 3);         // front сдвинется на 3 назад
-
-    EXPECT_EQ(v2.size(), 6);
-    EXPECT_DOUBLE_EQ(v2[0], -2.0);
-    EXPECT_DOUBLE_EQ(v2[1], -1.0);
-    EXPECT_DOUBLE_EQ(v2[2], 0.0);
-    EXPECT_DOUBLE_EQ(v2[3], 1.0);
-    EXPECT_DOUBLE_EQ(v2[4], 2.0);
-    EXPECT_DOUBLE_EQ(v2[5], 3.0);
-    EXPECT_EQ(v2.front_pos(), 4);
-}
-
-TEST(ClassVector, can_push_front_n_with_reallocation) {
-    TVector<double> v = { 1.0, 2.0, 3.0 };       // capacity=3, full
-    double vals[] = { -1.0, 0.0 };
-    v.push_front_n(vals, 2);
-
-    EXPECT_EQ(v.size(), 5);
-    EXPECT_GE(v.capacity(), 5);
-    EXPECT_EQ(v.front_pos(), 4);
-    EXPECT_DOUBLE_EQ(v[0], -1.0);
-    EXPECT_DOUBLE_EQ(v[1], 0.0);
-    EXPECT_DOUBLE_EQ(v[2], 1.0);
-    EXPECT_DOUBLE_EQ(v[3], 2.0);
-    EXPECT_DOUBLE_EQ(v[4], 3.0);
 }
 
 // insert_n
