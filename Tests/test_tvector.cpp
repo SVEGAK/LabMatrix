@@ -150,7 +150,7 @@ TEST(ClassVector, can_push_front_with_reallocation) {
 
     EXPECT_EQ(v.size(), 4);
     EXPECT_GE(v.capacity(), 4);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER - 1); // front сместился на буфер
+    EXPECT_EQ(v.front_pos(), 0); // front сместился на буфер
     EXPECT_DOUBLE_EQ(v.front(), 0.0);
     EXPECT_DOUBLE_EQ(v[0], 0.0);
     EXPECT_DOUBLE_EQ(v[1], 1.0);
@@ -171,7 +171,7 @@ TEST(ClassVector, can_push_back) {
     TVector<double> v1 = { 1.0, 3.4, 1.1 };
     v1.push_back(2.5);
     EXPECT_EQ(v1.back(), 2.5);
-    EXPECT_EQ(v1.back_pos(), 3 + FRONT_BUFFER);
+    EXPECT_EQ(v1.back_pos(), 3);
 }
 
 TEST(ClassVector, can_push_back_in_empty_vector) {
@@ -187,7 +187,7 @@ TEST(ClassVector, can_push_back_with_reallocation) {
 
     EXPECT_EQ(v.size(), 4);
     EXPECT_GE(v.capacity(), 4);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER); // начало сдвинуто на буфер
+    EXPECT_EQ(v.front_pos(), 0); // начало сдвинуто на буфер
     EXPECT_DOUBLE_EQ(v.front(), 1.0);
     EXPECT_DOUBLE_EQ(v.back(), 4.0);
     EXPECT_DOUBLE_EQ(v[0], 1.0);
@@ -206,7 +206,7 @@ TEST(ClassVector, can_insert_to_front) {
     TVector<double> v1 = { 1.0, 3.4, 1.1 };
     EXPECT_EQ(v1.front_pos(), 0);
     v1.insert(2.5, v1.front_pos());
-    EXPECT_EQ(v1.front_pos(), FRONT_BUFFER);
+    EXPECT_EQ(v1.front_pos(), 0);
     EXPECT_EQ(v1.capacity(), 15);
     EXPECT_EQ(v1.size(), 4);
 }
@@ -216,7 +216,7 @@ TEST(ClassVector, can_insert_with_reallocation) {
 
     EXPECT_EQ(v.size(), 4);
     EXPECT_GE(v.capacity(), 4);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER); // данные выровнены с буфером
+    EXPECT_EQ(v.front_pos(), 0); // данные выровнены с буфером
     EXPECT_DOUBLE_EQ(v[0], 1.0);
     EXPECT_DOUBLE_EQ(v[1], 99.0);
     EXPECT_DOUBLE_EQ(v[2], 2.0);
@@ -671,7 +671,7 @@ TEST(ClassVector, can_push_back_n_with_reallocation) {
 
     EXPECT_EQ(v.size(), 6);
     EXPECT_GE(v.capacity(), 6);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER); // после реаллокации с буфером
+    EXPECT_EQ(v.front_pos(), 0); // после реаллокации 
     EXPECT_DOUBLE_EQ(v[0], 1.0);
     EXPECT_DOUBLE_EQ(v[1], 2.0);
     EXPECT_DOUBLE_EQ(v[2], 3.0);
@@ -740,7 +740,7 @@ TEST(ClassVector, can_insert_n_middle) {
 
     EXPECT_EQ(v.size(), 6);
     EXPECT_GE(v.capacity(), 6);
-    EXPECT_EQ(v.front_pos(), FRONT_BUFFER);
+    EXPECT_EQ(v.front_pos(), 0);
     EXPECT_DOUBLE_EQ(v[0], 1.0);
     EXPECT_DOUBLE_EQ(v[1], 2.0);
     EXPECT_DOUBLE_EQ(v[2], 3.0);

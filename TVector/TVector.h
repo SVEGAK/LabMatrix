@@ -236,7 +236,7 @@ TVector<T>& TVector<T>::operator=(TVector&& other) noexcept
 }
 template <typename T>
 const T& TVector<T>::operator[](size_t pos) const {
-	if (_mem._size <= 0) { throw std::logic_error("Can't apply [] operator to empty vector(size<=0)."); }
+	if (this->is_empty()) { throw std::logic_error("Can't apply [] operator to empty vector: size = 0."); }
 	pos = (pos + _front) % capacity();
 	return (_mem._data[pos]);
 }
@@ -244,7 +244,7 @@ const T& TVector<T>::operator[](size_t pos) const {
 template <typename T>
 T& TVector<T>::operator[](size_t pos)
 {
-	if (_mem._size <= 0) { throw std::logic_error("Can't apply [] operator to empty vector(size<=0)."); }
+	if (this->is_empty()) { throw std::logic_error("Can't apply [] operator to empty vector: size = 0."); }
 	pos = (pos + _front) % capacity();
 	return (_mem._data[pos]);
 }
@@ -264,8 +264,8 @@ void TVector<T>::push_back(T elem) {
 
 	}
 	else if (is_full()) {
-		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER); // выделяем буфер
-		_front = FRONT_BUFFER;
+		_mem.reset_memory(size() + 1, _front); // выделяем буфер
+		_front = 0;
 		_back = (_mem._size > 0) ? _front + size() - 1 : 0;//пересчитываю back c защитой от вылета из size_t
 		_mem._data[_back] = elem;// ставлю элемент в нововыделенную ячейку
 		return;
@@ -289,8 +289,8 @@ void TVector<T>::insert(T elem, size_t pos)
 	}
 
 	if (is_full()) {
-		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER);
-		_front = FRONT_BUFFER;
+		_mem.reset_memory(size() + 1, _front);
+		_front = 0;
 		_back = (_mem._size > 0) ? _front + size() - 1 : 0;
 	}
 	else {
@@ -314,8 +314,8 @@ void TVector<T>::push_front(T elem)
 		return;
 	}
 	if ((is_full()) || (_front == _back) || (_front == 0)) {
-		_mem.reset_memory(size() + 1, _front, FRONT_BUFFER); //увеличиваем на 1 ячейку size + выделяем буфер
-		_front = FRONT_BUFFER - 1;//берем элемент перед тем который уже стоит первым
+		_mem.reset_memory(size() + 1, _front,1); //увеличиваем на 1 ячейку size + выделяем буфер
+		_front = 0;//берем элемент перед тем который уже стоит первым
 		_back = (_mem._size > 0) ? _front + size() - 1 : 0;
 		_mem._data[_front] = std::move(elem);
 		return;

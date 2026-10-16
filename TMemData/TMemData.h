@@ -2,7 +2,6 @@
 #include <initializer_list>
 
 #define MEM_STEP 15
-#define FRONT_BUFFER 5
 template <typename T>
 class TVector;
 template <typename T>
