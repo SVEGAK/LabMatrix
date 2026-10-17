@@ -311,5 +311,26 @@ TEST(TMatrixConstructorTest, EmptyMatrix) {
     EXPECT_EQ(mat1.getRows(), 0);
     EXPECT_EQ(mat1.getCols(), 0); 
 }
+TEST(TMatrixTest, TransposeNonSquareMatrix) {
+    // Создаем матрицу 2x3
+    TMatrix<int> mat({
+        {1, 2, 3},
+        {4, 5, 6}
+        });
 
+    mat.transpose();
+
+    EXPECT_EQ(mat.getRows(), 3);
+    EXPECT_EQ(mat.getCols(), 2);
+
+    // Проверяем элементы 
+    EXPECT_EQ(mat(0, 0), 1);
+    EXPECT_EQ(mat(0, 1), 4);
+
+    EXPECT_EQ(mat(1, 0), 2);
+    EXPECT_EQ(mat(1, 1), 5);
+
+    EXPECT_EQ(mat(2, 0), 3);
+    EXPECT_EQ(mat(2, 1), 6);
+}
 #endif

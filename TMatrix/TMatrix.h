@@ -43,6 +43,10 @@ public:
     TMatrix<Q>& operator-=(const TMatrix<Q>& other);
     TMatrix<Q> operator-(const TMatrix<Q>& other) const;
 
+    //Операторы присваивания
+    TMatrix& operator=(const TMatrix<Q>& other) = default;
+    TMatrix& operator=(TMatrix<Q>&& other) noexcept = default;
+
     // оператор доступа к элементу
     Q& operator()(size_t row, size_t col) {
         if (row >= this->size() || col >= (*this)[row].size()) {
@@ -61,6 +65,8 @@ public:
     // геттеры размеров
     size_t getRows() const { return this->size(); }
     size_t getCols() const { return this->size() > 0 ? (*this)[0].size() : 0; }
+
+    void transpose(); //Транспонирование матриц
 };
 
 
@@ -158,4 +164,17 @@ inline TMatrix<Q> TMatrix<Q>::operator-(const TMatrix<Q>& other) const
     TMatrix<Q> result((*this));
     result -= other;
     return result;
+}
+
+template<typename Q>
+void TMatrix<Q>::transpose()
+{
+    TMatrix<Q> transposed(this->getCols(), this->getRows());//Создаем транспонированную заготовку
+    for (size_t i = 0; i < this->getRows(); ++i) {
+        for (size_t j = 0; j < this->getCols(); ++j) {
+             transposed(j,i) = (*this)(i,j);
+        }
+    }
+    (*this) = std::move(transposed);
+
 }
