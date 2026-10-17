@@ -225,4 +225,91 @@ TEST(TMatrixOwn, IdentityMatrixMultiplication) {
     EXPECT_DOUBLE_EQ(result(1, 1), 4.0);
 }
 
+TEST(TMatrixConstructorTest, BasicSquareMatrix) {
+    const size_t rows = 2;
+    const size_t cols = 2;
+    int** data = new int* [rows];
+    data[0] = new int[cols] {1, 2};
+    data[1] = new int[cols] {3, 4};
+
+    TMatrix<int> mat(rows, cols, data);
+
+    EXPECT_EQ(mat.getRows(), 2);
+    EXPECT_EQ(mat.getCols(), 2);
+
+    EXPECT_EQ(mat(0, 0), 1);
+    EXPECT_EQ(mat(0, 1), 2);
+    EXPECT_EQ(mat(1, 0), 3);
+    EXPECT_EQ(mat(1, 1), 4);
+
+    delete[] data[0];
+    delete[] data[1];
+    delete[] data;
+}
+
+TEST(TMatrixConstructorTest, RectangularMatrixMoreRows) {
+    const size_t rows = 3;
+    const size_t cols = 2;
+    double** data = new double* [rows];
+    data[0] = new double[cols] {1.1, 2.2};
+    data[1] = new double[cols] {3.3, 4.4};
+    data[2] = new double[cols] {5.5, 6.6};
+
+    TMatrix<double> mat(rows, cols, data);
+
+    EXPECT_EQ(mat.getRows(), 3);
+    EXPECT_EQ(mat.getCols(), 2);
+
+    EXPECT_DOUBLE_EQ(mat(0, 0), 1.1);
+    EXPECT_DOUBLE_EQ(mat(2, 1), 6.6);
+
+    delete[] data[0];
+    delete[] data[1];
+    delete[] data[2];
+    delete[] data;
+}
+
+TEST(TMatrixConstructorTest, RectangularMatrixMoreCols) {
+    const size_t rows = 2;
+    const size_t cols = 4;
+    int** data = new int* [rows];
+    data[0] = new int[cols] {1, 2, 3, 4};
+    data[1] = new int[cols] {5, 6, 7, 8};
+
+    TMatrix<int> mat(rows, cols, data);
+
+    EXPECT_EQ(mat.getRows(), 2);
+    EXPECT_EQ(mat.getCols(), 4);
+
+    EXPECT_EQ(mat(0, 3), 4);
+    EXPECT_EQ(mat(1, 0), 5);
+
+    delete[] data[0];
+    delete[] data[1];
+    delete[] data;
+}
+TEST(TMatrixConstructorTest, SingleElement) {
+    int** data = new int* [1];
+    data[0] = new int[1] {42};
+
+    TMatrix<int> mat(1, 1, data);
+    EXPECT_EQ(mat.getRows(), 1);
+    EXPECT_EQ(mat.getCols(), 1);
+    EXPECT_EQ(mat(0, 0), 42);
+
+    delete[] data[0];
+    delete[] data;
+}
+TEST(TMatrixConstructorTest, EmptyMatrix) {
+    // Передаем nullptr, так как циклы не должны выполниться
+    TMatrix<int> mat0(0, 0, nullptr);
+    EXPECT_EQ(mat0.getRows(), 0);
+    EXPECT_EQ(mat0.getCols(), 0);
+
+    // 0 строк, 5 столбцов
+    TMatrix<int> mat1(0, 5, nullptr);
+    EXPECT_EQ(mat1.getRows(), 0);
+    EXPECT_EQ(mat1.getCols(), 0); 
+}
+
 #endif

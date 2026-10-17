@@ -14,6 +14,8 @@ public:
     TMathVector(std::initializer_list<T> list);                      // конструктор по списку инициализации
     TMathVector(const TMathVector<T>& other) = default;        // конструктор копирования
     TMathVector(TMathVector<T>&& other) noexcept = default;   // конструктор с move-семантикой
+    TMathVector(size_t size, size_t start_index)
+        : TVector<T>(size), _start_index(start_index) { (*this).shrink_to_fit(); } //Конструктор с установкой start_index для TTriangleMatrix
     ~TMathVector() = default;
 
     TMathVector<T> operator*(double val) const;                  //Умножение на скаляр

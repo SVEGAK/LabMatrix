@@ -23,6 +23,7 @@ public:
         }
         this->shrink_to_fit();
     }
+    TMatrix(size_t rows, size_t columns, Q** data);
     TMatrix(const TMatrix<Q>& other) = default;         // конструктор копирования
     TMatrix(TMatrix<Q>&& other) noexcept = default;     // конструктор с move-семантикой
     ~TMatrix() = default;
@@ -64,6 +65,19 @@ public:
 
 
 
+
+template<typename Q>
+TMatrix<Q>::TMatrix(size_t rows, size_t columns, Q** data):TMatrix(rows, columns)
+{
+    if (data == nullptr && rows > 0) {
+        throw std::invalid_argument("Empty input massive.");
+    }
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < columns; ++j) {
+            (*this)(i, j) = data[i][j];
+        }
+    }
+}
 
 template <typename Q>
 TMatrix<Q>& TMatrix<Q>::operator*=(double val) {
