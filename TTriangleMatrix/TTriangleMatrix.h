@@ -42,9 +42,9 @@ class TTriangleMatrix : private TMathVector<TMathVector<T>> {
 template<typename T>
 TTriangleMatrix<T>::TTriangleMatrix(size_t rows, size_t columns)
 {
-    for (size_t i = 0; i < n; ++i) {
-        // Верхнетреугольная: в строке i храним элементы с i-го по (n-1)-й
-        TMathVector<Q> row(n - i,i);
+    for (size_t i = 0; i < rows; ++i) {
+        size_t row_size = (i <= columns) ? (columns - i) : 0;
+        TMathVector<T> row(row_size, i);
         this->push_back(std::move(row));
     }
     this->shrink_to_fit();
@@ -98,3 +98,76 @@ TTriangleMatrix<T>::TTriangleMatrix(size_t rows, size_t columns, T** data)
     this->shrink_to_fit();
 }
 
+template<typename T>
+TTriangleMatrix<T>& TTriangleMatrix<T>::operator*=(double val) {
+    // Просто умножаем каждый внутренний вектор на скаляр через базовый класс
+    TMathVector<TMathVector<T>>::operator*=(val);
+    return *this;
+}
+
+template<typename T>
+TTriangleMatrix<T> TTriangleMatrix<T>::operator*(double val) const {
+    TTriangleMatrix<T> copy(*this);
+    copy *= val;
+    return copy;
+}
+
+template<typename T>
+TTriangleMatrix<T>& TTriangleMatrix<T>::operator+=(const TTriangleMatrix<T>& other) {
+    // Проверяем, что размеры матриц совпадают
+    if (this->size() != other.size()) {
+        throw std::invalid_argument("Matrix dimensions must match.");
+    }
+    // Сложение векторов-строк также берет на себя базовый TMathVector
+    TMathVector<TMathVector<T>>::operator+=(other);
+    return *this;
+}
+
+template<typename T>
+TTriangleMatrix<T> TTriangleMatrix<T>::operator+(const TTriangleMatrix<T>& other) const {
+    TTriangleMatrix<T> copy(*this);
+    copy += other;
+    return copy;
+}
+
+template<typename T>
+TTriangleMatrix<T>& TTriangleMatrix<T>::operator-=(const TTriangleMatrix<T>& other) {
+    if (this->size() != other.size()) {
+        throw std::invalid_argument("Matrix dimensions must match.");
+    }
+    TMathVector<TMathVector<T>>::operator-=(other);
+    return *this;
+}
+
+template<typename T>
+TTriangleMatrix<T> TTriangleMatrix<T>::operator-(const TTriangleMatrix<T>& other) const {
+    TTriangleMatrix<T> copy(*this);
+    copy -= other;
+    return copy;
+}
+
+template<typename T>
+T& TTriangleMatrix<T>::operator()(size_t row, size_t col)
+{
+    if (row >= getRows() || col >= getCols()) {
+        throw std::out_of_range("Matrix index out of bounds");
+    }
+    if (col < row) {
+        throw std::out_of_range("Access to zero element below diagonal");
+    }
+    return (*this)[col-row][col];
+}
+
+template<typename T>
+const T& TTriangleMatrix<T>::operator()(size_t row, size_t col) const
+{
+    if (row >= getRows() || col >= getCols()) {
+        throw std::out_of_range("Matrix index out of bounds");
+    }
+    if (col < row) {
+        throw std::out_of_range("Access to zero element below diagonal");
+    }
+    return (*this)[col-row][col];
+}
+
+    

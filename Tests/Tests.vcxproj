@@ -57,7 +57,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>..\TMemData;..\TVector;..\TMathVector;..\TMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\TMemData;..\TVector;..\TMathVector;..\TMatrix;..\TTriangleMatrix;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -109,6 +109,7 @@
     <ClCompile Include="Test_TMathVector.cpp" />
     <ClCompile Include="Test_TMatrix.cpp" />
     <ClCompile Include="Test_TMemData.cpp" />
+    <ClCompile Include="Test_TTriangleMatrix.cpp" />
     <ClCompile Include="Test_TVector.cpp" />
   </ItemGroup>
   <ItemGroup>
