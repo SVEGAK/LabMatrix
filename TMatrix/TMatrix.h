@@ -67,6 +67,29 @@ public:
     size_t getCols() const { return this->size() > 0 ? (*this)[0].size() : 0; }
 
     void transpose(); //Транспонирование матриц
+
+    friend std::ostream& operator<<(std::ostream& os, const TMatrix<Q>& mat) {
+        for (size_t i = 0; i < mat.getRows(); i++) {
+            os << "[ ";
+            for (size_t j = 0; j < mat.getCols(); j++) {
+                os << mat(i, j) << " ";
+            }
+            os << "]\n";
+        }
+        return os;
+    }
+
+    friend std::istream& operator>>(std::istream& is, TMatrix<Q>& mat) {
+        size_t rows, columns;
+        is >> rows >> columns;
+        mat = TMatrix<Q>(rows, columns); // Пересоздаем матрицу нужного размера
+        for (size_t i = 0; i < rows; i++) {
+            for (size_t j = 0; j < columns; j++) {
+                is >> mat(i, j);
+            }
+        }
+        return is;
+    }
 };
 
 
@@ -87,10 +110,7 @@ TMatrix<Q>::TMatrix(size_t rows, size_t columns, Q** data):TMatrix(rows, columns
 
 template <typename Q>
 TMatrix<Q>& TMatrix<Q>::operator*=(double val) {
-    for (size_t i = 0; i < this->size(); i++) {
-        // (*this)[i] возвращает ссылку на i-ю строку далее вызывается оператор *= TMathVector
-        (*this)[i] *= val;
-    }
+    TMathVector<TMathVector<Q>>::operator*=(val);
     return *this;
 }
 

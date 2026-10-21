@@ -39,6 +39,31 @@ class TTriangleMatrix : private TMathVector<TMathVector<T>> {
         // геттеры размеров
         size_t getRows() const { return this->size(); }
         size_t getCols() const { return this->size() > 0 ? (*this)[0].size() : 0; }
+
+        friend std::ostream& operator<<(std::ostream& os, const TTriangleMatrix<T>& mat) {
+            for (size_t i = 0; i < mat.getRows(); i++) {
+                os << "[ ";
+                for (size_t j = 0; j < mat.getCols(); j++) {
+                    os << mat(i, j) << " ";
+                }
+                os << "]\n";
+            }
+            return os;
+        }
+
+        friend std::istream& operator>>(std::istream& is, TTriangleMatrix<T>& mat) {
+            size_t rows, columns;
+            is >> rows >> columns;
+            mat = TTriangleMatrix<T>(rows, columns);
+            for (size_t i = 0; i < rows; i++) {
+                for (size_t j = 0; j < columns; j++) {
+                    T val;
+                    is >> val;
+                    mat(i, j) = val; // если j < i, оператор () просто проигнорирует запись
+                }
+            }
+            return is;
+        }
 };
 
 template<typename T>
@@ -102,7 +127,6 @@ TTriangleMatrix<T>::TTriangleMatrix(size_t rows, size_t columns, T** data)
 
 template<typename T>
 TTriangleMatrix<T>& TTriangleMatrix<T>::operator*=(double val) {
-    // Просто умножаем каждый внутренний вектор на скаляр через базовый класс
     TMathVector<TMathVector<T>>::operator*=(val);
     return *this;
 }
@@ -140,7 +164,6 @@ TTriangleMatrix<T>& TTriangleMatrix<T>::operator+=(const TTriangleMatrix<T>& oth
     if (this->size() != other.size()) {
         throw std::invalid_argument("Matrix dimensions must match.");
     }
-    // Сложение векторов-строк также берет на себя базовый TMathVector
     TMathVector<TMathVector<T>>::operator+=(other);
     return *this;
 }

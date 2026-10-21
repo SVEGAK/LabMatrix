@@ -41,7 +41,6 @@ TEST(TMatrixInherited, EqualityAndInequalityOperators) {
 }
 
 TEST(TMatrixInherited, StreamOutputOperator) {
-    // operator<< унаследован. TMathVector выводит себя как "{ a, b, c }"
     TMatrix<int> m = { {1, 2}, {3, 4} };
     std::ostringstream oss;
     oss << m;
@@ -51,14 +50,14 @@ TEST(TMatrixInherited, StreamOutputOperator) {
     EXPECT_TRUE(output.find("2") != std::string::npos);
     EXPECT_TRUE(output.find("3") != std::string::npos);
     EXPECT_TRUE(output.find("4") != std::string::npos);
-    // Ожидаем наличие фигурных скобок от TMathVector
-    EXPECT_TRUE(output.find("{") != std::string::npos);
+    EXPECT_TRUE(output.find("[") != std::string::npos);
 }
 
 TEST(TMatrixInherited, StreamInputOperator) {
     TMatrix<int> m;
-    std::istringstream iss("2 2 10 20 0 2 30 40 0");
-    // Расшифровка: 2 строки. Первая: размер 2, элементы 10, 20, start_idex = 0. Вторая: размер 2, элементы 30, 40, start_idex = 0.
+    std::istringstream iss("2 2 10 20 30 40");
+    // Расшифровка: 2 строки 2 столбца, { 10,20 }
+    //                                  { 30,40 }
 
     iss >> m;
 
