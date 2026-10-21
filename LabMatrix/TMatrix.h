@@ -1,0 +1,200 @@
+﻿#pragma once
+#include "TMathVector.h"
+#include <exception>
+#include <iostream>
+
+template <typename Q>
+class TMatrix: public TMathVector<TMathVector<Q>> {//Прямоугольная матрица
+public:
+    TMatrix(size_t rows = 0, size_t columns = 0) {
+        for (size_t i = 0; i < rows; ++i) {
+            this->push_back(TMathVector<Q>(columns));
+        }
+        this->shrink_to_fit();
+    }
+    TMatrix(std::initializer_list<std::initializer_list<Q>> list) {
+        if (list.size() == 0) { return; }
+        size_t expected_cols = list.begin()->size();
+        for (const auto& row_data : list) {
+            if (row_data.size() != expected_cols) {
+                throw std::invalid_argument("Все строки матрицы должны иметь одинаковую длину.");
+            }
+            this->push_back(TMathVector<Q>(row_data));
+        }
+        this->shrink_to_fit();
+    }
+    TMatrix(size_t rows, size_t columns, Q** data);
+    TMatrix(const TMatrix<Q>& other) = default;         // конструктор копирования
+    TMatrix(TMatrix<Q>&& other) noexcept = default;     // конструктор с move-семантикой
+    ~TMatrix() = default;
+
+    // умножение на скаляр
+    TMatrix<Q>& operator*=(double val);
+    TMatrix<Q> operator*(double val) const;
+
+    // умножение матрицы на матрицу
+    TMatrix<Q> operator*(const TMatrix<Q>& other) const;
+
+    // сложение
+    TMatrix<Q>& operator+=(const TMatrix<Q>& other);
+    TMatrix<Q> operator+(const TMatrix<Q>& other) const;
+
+    // вычитание
+    TMatrix<Q>& operator-=(const TMatrix<Q>& other);
+    TMatrix<Q> operator-(const TMatrix<Q>& other) const;
+
+    //Операторы присваивания
+    TMatrix& operator=(const TMatrix<Q>& other) = default;
+    TMatrix& operator=(TMatrix<Q>&& other) noexcept = default;
+
+    // оператор доступа к элементу
+    Q& operator()(size_t row, size_t col) {
+        if (row >= this->size() || col >= (*this)[row].size()) {
+            throw std::out_of_range("Matrix index out of bounds");
+        }
+        return (*this)[row][col];
+    }
+
+    const Q& operator()(size_t row, size_t col) const {
+        if (row >= this->size() || col >= (*this)[row].size()) {
+            throw std::out_of_range("Matrix index out of bounds");
+        }
+        return (*this)[row][col];
+    }
+
+    // геттеры размеров
+    size_t getRows() const { return this->size(); }
+    size_t getCols() const { return this->size() > 0 ? (*this)[0].size() : 0; }
+
+    void transpose(); //Транспонирование матриц
+
+    friend std::ostream& operator<<(std::ostream& os, const TMatrix<Q>& mat) {
+        for (size_t i = 0; i < mat.getRows(); i++) {
+            os << "[ ";
+            for (size_t j = 0; j < mat.getCols(); j++) {
+                os << mat(i, j) << " ";
+            }
+            os << "]\n";
+        }
+        return os;
+    }
+
+    friend std::istream& operator>>(std::istream& is, TMatrix<Q>& mat) {
+        size_t rows, columns;
+        is >> rows >> columns;
+        mat = TMatrix<Q>(rows, columns); // Пересоздаем матрицу нужного размера
+        for (size_t i = 0; i < rows; i++) {
+            for (size_t j = 0; j < columns; j++) {
+                is >> mat(i, j);
+            }
+        }
+        return is;
+    }
+};
+
+
+
+
+template<typename Q>
+TMatrix<Q>::TMatrix(size_t rows, size_t columns, Q** data):TMatrix(rows, columns)
+{
+    if (data == nullptr && rows > 0) {
+        throw std::invalid_argument("Empty input massive.");
+    }
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < columns; ++j) {
+            (*this)(i, j) = data[i][j];
+        }
+    }
+}
+
+template <typename Q>
+TMatrix<Q>& TMatrix<Q>::operator*=(double val) {
+    TMathVector<TMathVector<Q>>::operator*=(val);
+    return *this;
+}
+
+template <typename Q>
+TMatrix<Q> TMatrix<Q>::operator*(double val) const {
+    TMatrix<Q> result = *this;
+    result *= val;
+    return result;
+}
+
+template<typename Q>
+TMatrix<Q> TMatrix<Q>::operator*(const TMatrix<Q>& other) const
+{
+    if (this->getCols() != other.getRows()) {
+        throw std::logic_error("Left operand columns count ought to be equal right operand rows count.");
+    }
+    TMatrix<Q> result(this->getRows(), other.getCols());
+
+    for (size_t res_row = 0; res_row < this->getRows(); res_row++) {
+        for (size_t res_col = 0; res_col < other.getCols(); res_col++) {
+            Q sum = 0;
+            for (size_t operand_i = 0; operand_i < this->getCols(); operand_i++) {
+                sum += (*this)(res_row, operand_i) * other(operand_i, res_col);
+            }
+            result(res_row, res_col) = sum;
+        }
+    }
+    return result;
+
+}
+
+template<typename Q>
+TMatrix<Q>& TMatrix<Q>::operator+=(const TMatrix<Q>& other)
+{
+    if ((this->getCols() != other.getCols()) || (this->getRows() != other.getRows())) {
+        throw std::logic_error("Left operand rows and columns count ought to be equal right operand.");
+    }
+    for (size_t row = 0; row < this->getRows(); row++) {
+        for (size_t col = 0; col < this->getCols(); col++) {
+            (*this)(row, col) += other(row, col);
+        }
+    }
+    return (*this);
+
+}
+template<typename Q>
+inline TMatrix<Q> TMatrix<Q>::operator+(const TMatrix<Q>& other) const
+{
+    TMatrix<Q> result((*this));
+    result += other;
+    return result;
+}
+
+template<typename Q>
+inline TMatrix<Q>& TMatrix<Q>::operator-=(const TMatrix<Q>& other)
+{
+    if ((this->getCols() != other.getCols()) || (this->getRows() != other.getRows())) {
+        throw std::logic_error("Left operand rows and columns count ought to be equal right operand.");
+    }
+    for (size_t row = 0; row < this->getRows(); row++) {
+        for (size_t col = 0; col < this->getCols(); col++) {
+            (*this)(row, col) -= other(row, col);
+        }
+    }
+    return (*this);
+}
+
+template<typename Q>
+inline TMatrix<Q> TMatrix<Q>::operator-(const TMatrix<Q>& other) const
+{
+    TMatrix<Q> result((*this));
+    result -= other;
+    return result;
+}
+
+template<typename Q>
+void TMatrix<Q>::transpose()
+{
+    TMatrix<Q> transposed(this->getCols(), this->getRows());//Создаем транспонированную заготовку
+    for (size_t i = 0; i < this->getRows(); ++i) {
+        for (size_t j = 0; j < this->getCols(); ++j) {
+             transposed(j,i) = (*this)(i,j);
+        }
+    }
+    (*this) = std::move(transposed);
+
+}
